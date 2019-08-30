@@ -133,7 +133,7 @@ class mpu6050(object):
 def main():
     #1
     from machine import I2C, Pin
-    mpu = mpu6050(I2C(scl=Pin(5), sda=Pin(4))) # VCC=3V3, GND=GND
+    mpu = mpu6050(I2C(scl=Pin(5), sda=Pin(15))) # VCC=3V3, GND=GND
     print(mpu.get_values())
     # {'GyZ': 0, 'GyY': 0, 'GyX': 0, 'Tmp': 36.53, 'AcZ': 0, 'AcY': 0, 'AcX': 0}
     print(mpu.get_smoothed_values())
