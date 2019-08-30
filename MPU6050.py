@@ -29,7 +29,7 @@ Tmp : Température °C
 
 import machine
 
-class mpu6050():
+class mpu6050(object):
     def __init__(self, i2c, addr=0x68):
         self.iic = i2c
         self.addr = addr
