@@ -135,10 +135,13 @@ def main():
     from machine import I2C, Pin
     mpu = mpu6050(I2C(scl=Pin(5), sda=Pin(4))) # VCC=3V3, GND=GND
     print(mpu.get_values())
-    # {'GyZ': 0, 'GyY': 0, 'GyX': 0, 'Tmp': 36.53, 'AcZ': 0, 'AcY': 0, 'AcX': 0} pour mon premier test
+    # {'GyZ': 0, 'GyY': 0, 'GyX': 0, 'Tmp': 36.53, 'AcZ': 0, 'AcY': 0, 'AcX': 0}
     print(mpu.get_smoothed_values())
+    #{'GyZ': 4267.0, 'GyY': -1554.0, 'GyX': 155.4, 'Tmp': 30.72765, 'AcZ': 12427.2, 'AcY': -62.8, 'AcX': -523.2}
     print(mpu.calibrate())
+    #{'GyZ': 56.73999, 'GyY': 14.67, 'GyX': -16.08, 'Tmp': 28.43682, 'AcZ': 17802.08, 'AcY': -68.16, 'AcX': -708.7601}
     print(mpu.get_smoothed_values_calibrate(n_samples=100, calibration=mpu.calibrate()))
+    # {'GyZ': -0.9300041, 'GyY': 0.09000778, 'GyX': -0.2000008, 'Tmp': 0.05742073, 'AcZ': 2.482422, 'AcY': -10.04001, 'AcX': -8.560181}
 
 if __name__ == "__main__":
     main()
