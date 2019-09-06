@@ -1,0 +1,19 @@
+Voici un recap des fonctionnalités de l'esp que moi meme j'ai testé  (y en a d'autres) :
+- conversion analogique-numérique grace a l'ADC
+- Pavé tactil grace au module TouchPad
+- Mise en veille (et veille prolongée) d'un appareil grace au macro DEEPSLEEP et autres du module machine
+- Horloge et Chronometre, grace aux module 'delay and timing'
+- temperature(interne/externe), humidité, sonde de hall(magnetisme) grace au pilote DHT
+- flash et ecriture/lecture dans les tampons grace au module esp/esp32
+- canaux SPI matériels permettant des vitesses de transmission plus rapides (jusqu’à 80 MHz)
+- canaux SPI logiques
+- Les implémentations logicielles et matérielles du pilote I2C
+- variateur de frequence, tension/impulsion electrique
+- synchronisation (alternative) et contrôl des périphériques grace au module neoPixel
+- Reseau (Wifi, Bluetooth) grace au module network
+- interrupteur(blocage/deblocage des Pin)
+- Temps réel grace au module RTC (Real time clock)
+- WebREPL : web browser interactive prompt / invite interactive du navigateur Web
+- Controle des composants (connexion avec/sans fil) : LED, uServo, MPU...
+
+

@@ -1,0 +1,96 @@
+Détecteur tactile / Touch Sensor
+
+1) Introduction
+
+Un système de capteur tactile est construit sur un substrat qui porte des électrodes et des connexions pertinentes sous une surface plane de protection. Lorsqu'un utilisateur touche la surface, la variation de capacité est utilisée pour évaluer si le toucher était valide.
+
+L'ESP32 peut gérer jusqu'à 10 pavés tactiles/GPIO capacitifs. Les plages de détection peuvent être agencées en différentes combinaisons (par exemple, une matrice, un curseur), de sorte qu'une zone plus grande ou plusieurs points puissent être détectés. Le processus de détection du pavé tactile est sous le contrôle d'une machine à états finis implémentée par le matériel qui est lancée par un Touch Sensorlogiciel ou par une minuterie matérielle dédiée.
+
+Les registres de conception, de fonctionnement et de contrôle d'un capteur tactile sont décrits dans le Manuel de référence technique ESP32 (PDF). Veuillez vous référer à ce manuel pour plus de détails sur le fonctionnement de ce sous-système.
+
+Des détails détaillés sur la conception des capteurs tactiles et des instructions de développement de microprogrammes pour l'ESP32 sont disponibles dans la Note d'application du capteur tactile. Si vous souhaitez tester des capteurs tactiles dans diverses configurations sans les construire vous-même, consultez le Guide du kit de développement ESP32-Sense.
+
+2) Aperçu de la fonctionnalité
+La description de l'API est divisée en groupes de fonctions pour fournir un aperçu rapide des fonctionnalités suivantes:
+
+- Initialisation du pilote du pavé tactile
+- Configuration des broches GPIO du pavé tactile
+- Prendre des mesures
+- Réglage des paramètres de mesures
+- Filtrage des mesures
+- Méthodes de détection tactile
+- Configuration d'interruptions pour signaler la détection tactile
+- Se réveiller du mode veille lors d'une interruption
+
+Pour une description détaillée d'une fonction particulière, veuillez vous reporter à la section Référence d'API. L'implémentation pratique de cette API est décrite dans la section Exemples d'application.
+
+3) Initialisation
+Avant d'utiliser un pavé tactile, vous devez initialiser le pilote du pavé tactile en appelant la fonction touch_pad_init(). Cette fonction définit plusieurs paramètres du pilote .._DEFAULT répertoriés dans l'API Référence de  sous Macros. Il supprime également les informations sur les pads qui ont été touchés avant, le cas échéant, et désactive les interruptions.
+
+Si le pilote n'est plus requis, désinstallez-le en appelant touch_pad_deinit().
+
+3) Configuration
+L'activation de la fonctionnalité de capteur tactile pour un GPIO particulier est effectuée avec touch_pad_config().
+
+Utilisez la fonction touch_pad_set_fsm_mode() pour sélectionner si la mesure à pavé tactile (gérée par FSM) doit être lancée automatiquement par une minuterie matérielle ou par un logiciel. Si le mode logiciel est sélectionné, utilisez touch_pad_sw_start() pour démarrer le FSM.
+
+4) Mesures d'état tactile
+Les deux fonctions suivantes sont pratiques pour lire les mesures brutes ou filtrées du capteur:
+- touch_pad_read ()
+- touch_pad_read_filtered ()
+
+Ils peuvent également être utilisés, par exemple, pour évaluer une conception de pavé tactile en vérifiant la plage de lectures du capteur lorsqu'un pavé est touché ou relâché. Ces informations peuvent ensuite être utilisées pour établir un seuil de contact.
+
+Remarque : 
+Avant d'utiliser touch_pad_read_filtered(), vous devez initialiser et configurer le filtre en appelant des fonctions de filtrage spécifiques décrites dans la section Filtrage des mesures.
+
+Pour la démonstration de l’utilisation des deux fonctions de lecture, consultez l’exemple d’application périphériques/ touch_pad_read.
+
+5) Optimisation des mesures
+Un capteur tactile a plusieurs paramètres configurables pour correspondre aux caractéristiques d'une conception de pavé tactile particulière. Par exemple, pour détecter des changements de capacité plus faibles, il est possible de réduire la plage de tension de référence dans laquelle les tablettes tactiles sont chargées/déchargées. Les tensions de référence haute et basse sont définies à l'aide de la fonction touch_pad_set_voltage().
+
+Outre la possibilité de discerner des changements de capacité plus faibles, un effet secondaire positif est la réduction de la consommation d'énergie pour les applications à faible consommation. Un effet négatif probable est une augmentation du bruit de mesure. Si la plage dynamique des lectures obtenues est toujours satisfaisante, une réduction supplémentaire de la consommation d'énergie peut être réalisée en réduisant le temps de mesure avec touch_pad_set_meas_time().
+
+La liste suivante récapitule les paramètres de mesure disponibles et les fonctions «set» correspondantes:
+
+- Paramètres de charge/décharge du pavé tactile:
+* plage de tension: touch_pad_set_voltage()
+* vitesse (pente): touch_pad_set_cnt_mode()
+
+- Temps de mesure: touch_pad_set_meas_time()
+
+La relation entre la plage de tension (tensions de référence hautes/basses), la vitesse (pente) et le temps de mesure est illustrée dans la figure ci-dessous.
+
+6) Détection tactile
+La détection tactile est implémentée dans le matériel de l’ESP32 en fonction du seuil configuré par l’utilisateur et des mesures brutes exécutées par FSM. Utilisez les fonctions touch_pad_get_status() pour vérifier quels pads ont été touchés et touch_pad_clear_status () pour effacer les informations d'état du toucher.
+
+La détection tactile matérielle peut également être câblée pour des interruptions. C'est décrit dans la section suivante.
+
+Si les mesures sont bruyantes et que les changements de capacité sont faibles, la détection tactile du matériel peut ne pas être fiable. Pour résoudre ce problème, au lieu d’utiliser la détection matérielle/les interruptions fournies, implémentez le filtrage des mesures et effectuez la détection tactile dans votre propre application. Pour un exemple d'implémentation des deux méthodes de détection tactile, voir périphériques/ touch_pad_interrupt.
+
+7) Interruptions déclenchées tactiles
+Avant d'activer une interruption sur une détection tactile, vous devez établir un seuil de détection tactile. Utilisez les fonctions décrites dans Mesures de l'état tactile pour lire et afficher les mesures du capteur lorsqu'un pad est touché et relâché. Appliquez un filtre si les mesures sont bruyantes et si les changements de capacité relatifs sont faibles. En fonction de votre application et des conditions environnementales, testez l’influence des variations de la température et de la tension d’alimentation sur les valeurs mesurées.
+
+Une fois qu'un seuil de détection est établi, il peut être défini lors de l'initialisation avec touch_pad_config() ou lors de l'exécution avec touch_pad_set_thresh().
+
+Dans l'étape suivante, configurez le mode de déclenchement des interruptions. Ils peuvent être déclenchés en dessous ou au dessus du seuil, défini avec la fonction touch_pad_set_trigger_mode().
+
+Enfin, configurez et gérez les appels d’interruption à l’aide des fonctions suivantes:
+
+touch_pad_isr_register () / touch_pad_isr_deregister ()
+touch_pad_intr_enable () / touch_pad_intr_disable ()
+Lorsque les interruptions sont opérationnelles, vous pouvez obtenir des informations sur le pad auquel une interruption est arrivée en appelant touch_pad_get_status () et effacer le statut du pad avec touch_pad_clear_status ().
+
+Remarque
+
+Les interruptions sur la détection tactile fonctionnent sur des mesures brutes / non filtrées vérifiées par rapport au seuil établi par l'utilisateur et sont implémentées dans le matériel. L'activation de l'API de filtrage logiciel (voir Filtrage des mesures) n'affecte pas ce processus.
+
+8) Réveil du mode veille
+Si des interruptions du pavé tactile sont utilisées pour sortir la puce du mode veille, vous pouvez sélectionner une configuration de pads (SET1 ou les deux SET1 et SET2) qui doivent être touchées pour déclencher l’interruption et provoquer le réveil suivant. Pour ce faire, utilisez la fonction touch_pad_set_trigger_source().
+
+La configuration des modèles de bits requis des pads peut être gérée pour chaque "SET" avec:
+
+touch_pad_set_group_mask () / touch_pad_get_group_mask ()
+touch_pad_clear_group_mask ()
+
+9) Exemples d'application
