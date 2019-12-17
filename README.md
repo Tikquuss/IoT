@@ -2,6 +2,7 @@
 Il s'agit de contrôler un drone avec de l'outil informatique, en utilisant du micro-python et/ou de l'Arduino (C++) pour interagir avec certains de ses composants intégrés comme le carte ESP32, les Micro Servo, les cartes MPU-6050 (gyroscope, accelerometre)...
 
 # Explications
+
 ## capacitive_touch (tactile) 
 Permet d'executer une action en fonction de la brouche ou meme la pression exercée
 ## DHT_driver
@@ -36,7 +37,7 @@ code principal de l'eps
 ## machine
 librairie machine (librairie principal de micropython)
 ## mpu9150 
-accelerometre/giroscope
+accelerometre/gyroscope
 ## network
 communication par reseau
 ## recap_fonction
@@ -56,6 +57,11 @@ periodicité
 ## wifi_automatic
 creer automatiquement un point d'acces sur l'ESP au démarage
 
+# IDE
+## uPyCraft
+micropython
+## Arduino
+C++
 # Bibliographies
 
 https://docs.espressif.com/projects/esp-idf/en/latest/  
